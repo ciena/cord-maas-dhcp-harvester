@@ -333,7 +333,11 @@ def harvest(options):
     # Look for duplicate names and add the compressed MAC as a suffix
     names = {}
     for lease in verified:
+        # If no client hostname use MAC
         name = lease['client-hostname']
+        if 'client-hostname' not in lease or len(name) == 0:
+            name = "UNK-" + lease['hardware'].translate(None, ':').upper()
+
         if name in names:
             names[name] = '+'
         else:
@@ -343,6 +347,9 @@ def harvest(options):
     count = 0
     for lease in verified:
         name = lease['client-hostname']
+        if 'client-hostname' not in lease or len(name) == 0:
+            name = "UNK-" + lease['hardware'].translate(None, ':').upper()
+
         if (ifilter != None and name in ifilter) or matched(rfilter, name):
             if names[name] == '+':
                 lease['client-hostname'] = name + '-' + lease['hardware'].translate(None, ':').upper()
@@ -356,6 +363,9 @@ def harvest(options):
 
     for lease in verified:
         name = lease['client-hostname']
+        if 'client-hostname' not in lease or len(name) == 0:
+            name = "UNK-" + lease['hardware'].translate(None, ':').upper()
+
         if ifilter != None and name in ifilter or matched(rfilter, name):
             out.write(format(name, '<'+str(size)) + ' IN A ' + lease['ip_address'] + '\n')
     if options.dest != '-':
